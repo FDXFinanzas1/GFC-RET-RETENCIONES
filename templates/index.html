@@ -975,39 +975,60 @@ function mostrarProvWarn(ruc) {
     <div style="color:#78350F;font-size:12px;margin-bottom:12px">
       Puedes registrarlo ahora — el sistema completará los datos automáticamente en el próximo ciclo de sincronización.
     </div>
-    <button id="btn-registrar-ruc" onclick="registrarRuc('${ruc}')"
+    <button id="btn-registrar-ruc" onclick="confirmarRegistro('${ruc}')"
       style="background:var(--fd-navy);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;width:100%">
       + Registrar este RUC
     </button>
   `;
 }
 
+function confirmarRegistro(ruc) {
+  const info = document.getElementById('prov-info');
+  info.innerHTML = `
+    <div style="color:#92400E;font-size:13px;font-weight:600;margin-bottom:10px">
+      ¿Confirmas registrar el RUC <strong>${ruc}</strong>?
+    </div>
+    <div style="color:#78350F;font-size:12px;margin-bottom:14px">
+      El sistema completará los datos automáticamente en el próximo ciclo de sincronización.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="registrarRuc('${ruc}')"
+        style="flex:1;background:var(--fd-navy);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer">
+        Sí, registrar
+      </button>
+      <button onclick="mostrarProvWarn('${ruc}')"
+        style="flex:1;background:#F1F5F9;color:#374151;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer">
+        Cancelar
+      </button>
+    </div>
+  `;
+}
+
 async function registrarRuc(ruc) {
-  const btn = document.getElementById('btn-registrar-ruc');
-  btn.disabled = true;
-  btn.textContent = 'Registrando...';
+  const info = document.getElementById('prov-info');
+  info.innerHTML = `<div style="color:#92400E;font-size:12px">Registrando RUC ${ruc}...</div>`;
   try {
     const res = await fetch('/api/registrar_ruc', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ruc})
     });
     const data = await res.json();
-    const info = document.getElementById('prov-info');
     if (res.ok && data.ok) {
       info.className = 'prov-card ok';
       info.innerHTML = `
-        <div style="color:var(--fd-navy);font-size:13px;font-weight:700;margin-bottom:4px">✓ RUC registrado correctamente</div>
-        <div style="color:#64748B;font-size:12px">El sistema completará nombre, tipo y demás datos en el próximo ciclo. Por ahora selecciona el tipo manualmente para continuar.</div>
+        <div style="color:var(--fd-navy);font-size:13px;font-weight:700;margin-bottom:6px">✓ RUC registrado correctamente</div>
+        <div style="color:#64748B;font-size:12px">El sistema completará nombre, tipo y demás datos automáticamente. Vuelve a consultar este RUC más tarde.</div>
       `;
     } else {
-      btn.disabled = false;
-      btn.textContent = '+ Registrar este RUC';
-      alert(data.msg || data.error || 'Error al registrar');
+      info.className = 'prov-card warn';
+      info.innerHTML = `
+        <div style="color:#92400E;font-size:13px;font-weight:600;margin-bottom:6px">Este RUC ya está registrado en la base de datos.</div>
+        <div style="color:#78350F;font-size:12px">Si los datos aún no aparecen, espera el próximo ciclo de sincronización.</div>
+      `;
     }
   } catch(e) {
-    btn.disabled = false;
-    btn.textContent = '+ Registrar este RUC';
-    alert('Error de conexión: ' + e.message);
+    info.className = 'prov-card err';
+    info.innerHTML = `<div style="color:var(--fd-pink);font-size:13px;font-weight:600">Error de conexión: ${e.message}</div>`;
   }
 }
 
