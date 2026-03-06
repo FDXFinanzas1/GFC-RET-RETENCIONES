@@ -1109,19 +1109,58 @@ function toggleConceptoPanel() {
   }
 }
 
+const KEYWORDS_CONCEPTO = {
+  'COMBUSTIBLE': ['gasolina','diesel','combustible','gasolinera','extra','super','nafta','gasoil','petroleo','combustible'],
+  '332':  ['rimpe popular','negocio popular','preimpreso','comprobante preimpreso','rimpe negocio'],
+  '343':  ['rimpe emprendedor','emprendedor','rimpe'],
+  '310':  ['transporte','flete','delivery','envio','mensajeria','courier','camion','camioneta','acarreo','traslado','logistica','encomienda','despacho','taxi','uber','cabify'],
+  '312A': ['pollo','carne','res','cerdo','chancho','cordero','pavo','conejo','trucha','tilapia','pescado','camaron','mariscos','lechuga','tomate','cebolla','zanahoria','papa','yuca','maiz','verde','platano','maduro','naranja','limon','aguacate','mora','fresa','uvilla','brocoli','coliflor','pimiento','arveja','frejol','espinaca','culantro','perejil','apio','hierba','miel','huevo','leche','queso','agropecuario','avicola','pecuario','productor','campo','granja','finca','cosecha','verdura','vegetal','hortaliza','fruta','maracuya','granadilla','babaco','melloco','remolacha','rabano','pepino','acelga','nabo','col','repollo','alcachofa','choclo','palmito','yuca','camote','aji','puerro','apio','berro','albahaca','oregano','tomillo','romero','lacteos','salmon','atun','sardina','pulpo','calamar','cangrejo','langosta','langostino','ostra'],
+  '312C': ['distribuidora','distribuidor','comercializadora','intermediario','mayorista','mercado mayorista','proveedor carnes','proveedor alimentos','distribucion alimentos','comercializador','digeca'],
+  '312':  ['insumo','materiales','suministros','vajilla','menaje','utensilios','herramienta','mueble','silla','mesa','estanteria','envase','empaque','caja','botella','servilleta','desechable','detergente','jabon','alcohol','cloro','quimico','repuesto','accesorio','mercaderia','articulo','producto','equipo','utiles','papel','limpiador','esponja','limpion','bolsa','plastico','tacho','balde','escoba','trapeador','guantes','uniforme','mantel','cuberteria','vidrio','ceramica','porcelana','vaso','plato','taza','cubierto','bandeja'],
+  '343A': ['luz','electricidad','energia electrica','planilla','cnel','eeq','medidor','servicio electrico','corriente electrica','kwh'],
+  '322':  ['seguro','poliza','aseguradora','prima','reaseguro','seguro vehicular','seguro vida','seguro medico','seguro accidentes','aseguramiento'],
+  '307':  ['limpieza','aseo','mantenimiento','tecnico','plomero','electricista','mecanico','operario','albanil','pintor','jardinero','fumigacion','plagas','lavado','desinfeccion','reparacion','instalacion','soldador','carpintero','cerrajero','gasfitero','arreglo','enderezada','latoneria','chapisteria','desague','tuberia','grifo','llaves','cerradura','vidrio','ventana','puerta','techo','piso','jardineria','podada','limpia','servicios generales','auxiliar','ayudante','obreros','guarda','vigilante','seguridad','conserje'],
+  '309':  ['publicidad','anuncio','propaganda','marketing','redes sociales','diseno grafico','impresion','banner','letrero','senaletica','flyer','brochure','pauta','radio','television','prensa','agencia','fotografia','video','filmacion','grabacion','edicion','community manager','influencer','publicista','creativo','campana','rotulo','valla','gigantografia'],
+  '311':  ['liquidacion de compra','productor sin ruc','agricultor sin ruc','campesino','rusticidad','sin factura','sin comprobante'],
+  '346':  ['varios','miscelaneos','otros servicios','servicio general','asesoria general','consultoria general','gestion','tramite','servicio no clasificado','servicio administrativo','gestion cobros','cobros','recaudacion','custodia','bodegaje','almacenaje','empaque servicio','estiba','cargue','descargue','maniobra'],
+  '3030': ['auditoria','estudio juridico','bufete','firma contable','consultoria empresarial','asesoria legal empresa','asesoria contable empresa','empresa consultora','servicios profesionales sociedad','outsourcing','contabilidad empresa'],
+  '3482': ['comision sociedad','intermediacion','corretaje','agenciamiento','comision empresa'],
+  '303':  ['contador','abogado','medico','arquitecto','ingeniero','economista','psicologo','nutricionista','auditor independiente','asesor profesional','consultor profesional','honorarios','titulo profesional','odontologo','veterinario','farmaceutico','quimico','biologo','geologo','topografo','notario'],
+  '304':  ['analista','programador','desarrollador','diseno web','asesor sin titulo','coach','mentor','consultor sin titulo','community','soporte tecnico','sistemas','informatica','software','web','app','datos','estadistica','investigacion'],
+  '304E': ['capacitacion','entrenamiento','taller','curso','formacion','instructor','profesor particular','docente externo','facilitador','charla','seminario','conferencia','adiestramiento','leccion','clase','academia'],
+  '320':  ['arriendo','alquiler','renta local','local comercial','bodega alquiler','oficina alquiler','inmueble','canon arrendamiento','arrendador','arrendamiento','lease','subarriendo','coworking','parqueo','parqueadero','garaje']
+};
+
+function _codigosMatchKeyword(q) {
+  const ql = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const matched = new Set();
+  Object.entries(KEYWORDS_CONCEPTO).forEach(([cod, kws]) => {
+    kws.forEach(kw => {
+      const kwn = kw.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      if (kwn.includes(ql) || ql.includes(kwn)) matched.add(cod);
+    });
+  });
+  return matched;
+}
+
 function renderConceptoOptions(q) {
   const sel = document.getElementById('concepto');
   const container = document.getElementById('concepto-options');
   const currentVal = sel.value;
-  q = (q || '').toLowerCase();
+  q = (q || '').toLowerCase().trim();
   let html = '';
+
+  // Buscar por keywords si la búsqueda no coincide con texto del concepto
+  const kwMatches = q.length >= 3 ? _codigosMatchKeyword(q) : new Set();
 
   sel.querySelectorAll('optgroup').forEach(grp => {
     if (grp.hidden) return;
     const opts = [...grp.querySelectorAll('option')].filter(o => {
       if (o.hidden) return false;
       if (!q) return true;
-      return o.text.toLowerCase().includes(q) || o.value.toLowerCase().includes(q);
+      const textMatch = o.text.toLowerCase().includes(q) || o.value.toLowerCase().includes(q);
+      const kwMatch = kwMatches.has(o.value);
+      return textMatch || kwMatch;
     });
     if (!opts.length) return;
     html += `<div class="concepto-group-label">${grp.label}</div>`;
@@ -1129,8 +1168,9 @@ function renderConceptoOptions(q) {
       const pct = parseFloat(opt.getAttribute('data-pct'));
       const pctStr = pct === 0 ? '0%' : pct + '%';
       const isSel = opt.value === currentVal;
+      const isKw = kwMatches.has(opt.value) && !opt.text.toLowerCase().includes(q);
       html += `<div class="concepto-option${isSel ? ' sel' : ''}" onclick="selectConcepto('${opt.value}')">
-        <span class="opt-pct">${pctStr}</span>${opt.text}
+        <span class="opt-pct">${pctStr}</span>${opt.text}${isKw ? ' <span style="font-size:10px;color:#64748B;font-weight:400">· coincide</span>' : ''}
       </div>`;
     });
   });
