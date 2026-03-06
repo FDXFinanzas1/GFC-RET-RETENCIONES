@@ -961,6 +961,13 @@ async function buscarProveedor() {
       document.getElementById('prov-actividad').after(warn);
     }
 
+    if ((data.gran_contribuyente||'NO') === 'SI') {
+      const gc = document.createElement('div');
+      gc.style.cssText = 'margin-top:10px;padding:12px 14px;background:#EFF6FF;border:1.5px solid #3B82F6;border-radius:8px;color:#1E40AF;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px';
+      gc.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> GRAN CONTRIBUYENTE — No se realiza retención de IR ni de IVA en ningún concepto.';
+      document.getElementById('prov-actividad').after(gc);
+    }
+
     document.getElementById('num1').className = 'step-num done';
     actualizarHint();
   } catch(e) {
