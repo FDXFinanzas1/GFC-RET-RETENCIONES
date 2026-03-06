@@ -842,7 +842,7 @@ async function buscarProveedor() {
     btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Consultar';
 
     if (!res.ok) {
-      mostrarProvWarn('RUC no encontrado en la base. Selecciona el tipo manualmente:');
+      mostrarProvWarn(ruc);
       manual.style.display = 'block';
       prov = null; actualizarHint(); return;
     }
@@ -893,11 +893,51 @@ function mostrarProvError(msg) {
   info.style.display = 'block';
   info.innerHTML = `<div style="color:var(--fd-pink);font-size:13px;font-weight:600">${msg}</div>`;
 }
-function mostrarProvWarn(msg) {
+function mostrarProvWarn(ruc) {
   const info = document.getElementById('prov-info');
   info.className = 'prov-card warn';
   info.style.display = 'block';
-  info.innerHTML = `<div style="color:#92400E;font-size:13px;font-weight:600">${msg}</div>`;
+  info.innerHTML = `
+    <div style="color:#92400E;font-size:13px;font-weight:600;margin-bottom:10px">
+      RUC <strong>${ruc}</strong> no está registrado como proveedor.
+    </div>
+    <div style="color:#78350F;font-size:12px;margin-bottom:12px">
+      Puedes registrarlo ahora — el sistema completará los datos automáticamente en el próximo ciclo de sincronización.
+    </div>
+    <button id="btn-registrar-ruc" onclick="registrarRuc('${ruc}')"
+      style="background:var(--fd-navy);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;width:100%">
+      + Registrar este RUC
+    </button>
+  `;
+}
+
+async function registrarRuc(ruc) {
+  const btn = document.getElementById('btn-registrar-ruc');
+  btn.disabled = true;
+  btn.textContent = 'Registrando...';
+  try {
+    const res = await fetch('/api/registrar_ruc', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ruc})
+    });
+    const data = await res.json();
+    const info = document.getElementById('prov-info');
+    if (res.ok && data.ok) {
+      info.className = 'prov-card ok';
+      info.innerHTML = `
+        <div style="color:var(--fd-navy);font-size:13px;font-weight:700;margin-bottom:4px">✓ RUC registrado correctamente</div>
+        <div style="color:#64748B;font-size:12px">El sistema completará nombre, tipo y demás datos en el próximo ciclo. Por ahora selecciona el tipo manualmente para continuar.</div>
+      `;
+    } else {
+      btn.disabled = false;
+      btn.textContent = '+ Registrar este RUC';
+      alert(data.msg || data.error || 'Error al registrar');
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '+ Registrar este RUC';
+    alert('Error de conexión: ' + e.message);
+  }
 }
 
 function onManualTipo() {

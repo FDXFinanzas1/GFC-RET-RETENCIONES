@@ -117,6 +117,28 @@ def buscar_proveedor(ruc):
     except Exception as e:
         return jsonify({'error': f'Error de conexion: {str(e)[:120]}'}), 500
 
+@app.route('/api/registrar_ruc', methods=['POST'])
+def registrar_ruc():
+    d = request.get_json()
+    ruc = (d.get('ruc') or '').strip()
+    if len(ruc) != 13 or not ruc.isdigit():
+        return jsonify({'error': 'RUC invalido'}), 400
+    try:
+        conn = get_conn(); cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO public.proveedores_sri (ruc)
+            VALUES (%s)
+            ON CONFLICT (ruc) DO NOTHING
+        ''', (ruc,))
+        inserted = cur.rowcount
+        conn.commit(); cur.close(); conn.close()
+        if inserted:
+            return jsonify({'ok': True, 'msg': 'RUC registrado. El sistema completará los datos automáticamente.'})
+        else:
+            return jsonify({'ok': False, 'msg': 'El RUC ya existe en la base de datos.'})
+    except Exception as e:
+        return jsonify({'error': f'Error al registrar: {str(e)[:120]}'}), 500
+
 @app.route('/api/calcular', methods=['POST'])
 def calcular():
     d = request.get_json()
