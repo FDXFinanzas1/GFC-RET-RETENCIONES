@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Retenciones FOODIX 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fd-dark:         #123450;
+      --fd-pink:         #F43F5E;
+      --fd-pink-dark:    #E11D48;
+      --fd-pink-light:   #FB7185;
+      --fd-pink-lighter: #FDA4AF;
+      --fd-slate:        #64748B;
+      --fd-slate-light:  #94A3B8;
+      --fd-slate-border: #CBD5E1;
+      --fd-border-light: #E2E8F0;
+      --fd-bg:           #F8FAFC;
+      --fd-bg-alt:       #EFF1F5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--fd-bg);
+      min-height: 100vh;
+      color: var(--fd-dark);
+    }
+
+    h1,h2,h3,h4,h5,h6 { font-family: 'Inter', sans-serif; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--fd-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--fd-slate-light); border-radius: 3px; }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--fd-pink) !important;
+      box-shadow: 0 0 0 3px rgba(244,63,94,0.1);
+    }
+
+    /* ── LAYOUT ── */
+    .page { min-height: 100vh; background: var(--fd-bg); padding: 24px 16px 48px; }
+    .container { max-width: 720px; margin: 0 auto; }
+
+    /* ── HEADER ── */
+    .header {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid rgba(203,213,225,0.3);
+      box-shadow: 0 2px 8px rgba(15,23,42,0.06);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fd-pink);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .header-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--fd-dark);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+    .header-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--fd-slate-light);
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+    .header-badge {
+      background: linear-gradient(180deg, #FB7185 0%, #F43F5E 100%);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(244,63,94,0.25);
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid rgba(203,213,225,0.3);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--fd-bg);
+    }
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--fd-bg);
+      border: 1.5px solid rgba(203,213,225,0.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      color: var(--fd-slate);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .step-num.done {
+      background: linear-gradient(180deg, #FB7185 0%, #F43F5E 100%);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 2px 8px rgba(244,63,94,0.3);
+    }
+    .step-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--fd-dark);
+    }
+    .step-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--fd-slate-light);
+      margin-top: 2px;
+    }
+    .card-body { padding: 20px; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--fd-pink);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(244,63,94,0.2) 50%, transparent 100%);
+      margin-bottom: 16px;
+    }
+
+    /* ── INPUT ── */
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fd-dark);
+      margin-bottom: 6px;
+    }
+    .input {
+      width: 100%;
+      height: 48px;
+      background: var(--fd-bg);
+      border: 1px solid rgba(203,213,225,0.5);
+      border-radius: 12px;
+      padding: 0 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fd-dark);
+      transition: border-color 0.2s;
+    }
+    .input::placeholder { color: var(--fd-slate-light); font-weight: 400; }
+    .input-prefix { position: relative; }
+    .input-prefix::before {
+      content: '$';
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-weight: 700; color: var(--fd-slate-light);
+      font-size: 13px; z-index: 1;
+    }
+    .input-prefix .input { padding-left: 26px; }
+
+    .select {
+      width: 100%;
+      height: 48px;
+      background: var(--fd-bg);
+      border: 1px solid rgba(203,213,225,0.5);
+      border-radius: 12px;
+      padding: 0 36px 0 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fd-dark);
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      height: 48px; padding: 0 20px;
+      border-radius: 13px; border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(180deg, #FB7185 0%, #F43F5E 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(244,63,94,0.25);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(244,63,94,0.35); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; box-shadow: none; transform: none; }
+    .btn-outline {
+      background: white;
+      color: var(--fd-slate);
+      border: 1px solid var(--fd-border-light);
+    }
+    .btn-outline:hover { background: var(--fd-bg); color: var(--fd-dark); }
+    .btn-dark {
+      background: var(--fd-dark);
+      color: white;
+    }
+    .btn-dark:hover { background: rgba(18,52,80,0.9); }
+    .btn-sm {
+      height: 36px; padding: 0 14px;
+      font-size: 12px; border-radius: 10px;
+    }
+    .btn-full { width: 100%; }
+
+    /* ── RUC SEARCH ── */
+    .ruc-row { display: flex; gap: 8px; }
+    .ruc-row .input { font-size: 16px; font-weight: 700; letter-spacing: 2px; flex: 1; }
+
+    /* ── PROVIDER CARD ── */
+    .prov-card {
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      display: none;
+    }
+    .prov-card.ok  { background: var(--fd-bg); border: 1px solid rgba(203,213,225,0.4); }
+    .prov-card.err { background: #FFF0F3; border: 1px solid rgba(244,63,94,0.2); }
+    .prov-card.warn{ background: #FFFBEB; border: 1px solid rgba(245,158,11,0.2); }
+    .prov-name { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: var(--fd-dark); }
+    .prov-ruc  { font-size: 11px; color: var(--fd-slate-light); margin-top: 2px; letter-spacing: 0.5px; }
+
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 8px;
+      font-size: 11px; font-weight: 600;
+    }
+    .pill-estado-ok   { background: #DCFCE7; color: #15803D; }
+    .pill-estado-bad  { background: #FEE2E2; color: #DC2626; }
+    .pill-tipo        { background: #EFF6FF; color: #1D4ED8; }
+    .pill-regimen     { background: #F5F3FF; color: #6D28D9; }
+    .pill-ce          { background: #FFF7ED; color: #C2410C; }
+    .pill-gc          { background: #FDF2F8; color: #9D174D; }
+    .pill-obl         { background: #F0FDF4; color: #15803D; }
+    .prov-actividad   { font-size: 11px; color: var(--fd-slate-light); margin-top: 8px; line-height: 1.4; }
+
+    /* ── MANUAL SELECT ── */
+    .manual-wrap { margin-top: 12px; display: none; }
+    .manual-label {
+      font-size: 11px; font-weight: 700; color: var(--fd-pink);
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ── CONCEPTO BADGE ── */
+    .concepto-badge {
+      display: none;
+      margin-top: 12px;
+      background: var(--fd-bg);
+      border: 1px solid rgba(203,213,225,0.4);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .badge-pct { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: var(--fd-pink); line-height: 1; }
+    .badge-pct-label { font-size: 11px; color: var(--fd-slate-light); margin-top: 2px; }
+    .badge-desc { font-size: 13px; font-weight: 600; color: var(--fd-dark); }
+    .cod-chip {
+      display: inline-block;
+      background: var(--fd-dark); color: white;
+      border-radius: 6px; padding: 2px 8px;
+      font-size: 11px; font-weight: 700; margin-top: 4px;
+    }
+    .iva-hint { font-size: 12px; margin-top: 6px; }
+
+    /* ── TIPO TOGGLE ── */
+    .tipo-toggle { display: flex; gap: 8px; margin-top: 12px; }
+    .tipo-btn {
+      flex: 1; padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(203,213,225,0.5);
+      background: var(--fd-bg);
+      cursor: pointer; text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      color: var(--fd-slate);
+      transition: all 0.2s;
+    }
+    .tipo-btn svg { display: block; margin: 0 auto 6px; }
+    .tipo-btn.active {
+      border-color: var(--fd-pink);
+      background: #FFF0F3;
+      color: var(--fd-pink);
+      box-shadow: 0 0 0 3px rgba(244,63,94,0.08);
+    }
+
+    /* ── MONTOS ── */
+    .montos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .montos-grid { grid-template-columns: 1fr; } }
+    .iva-btn {
+      margin-top: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: 1px solid rgba(203,213,225,0.5);
+      border-radius: 8px; padding: 5px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      color: var(--fd-slate); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .iva-btn:hover { border-color: var(--fd-dark); color: var(--fd-dark); }
+
+    /* ── FORM ERROR ── */
+    .form-error {
+      display: none; align-items: center; gap: 8px;
+      margin-top: 12px; padding: 10px 14px;
+      background: #FFF0F3; border: 1px solid rgba(244,63,94,0.2);
+      border-radius: 10px;
+      font-size: 12px; font-weight: 600; color: var(--fd-pink);
+    }
+
+    /* ── RESULTADO ── */
+    #resultado { display: none; animation: slideUp .3s ease; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    .res-card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid rgba(203,213,225,0.3);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(15,23,42,0.08);
+    }
+    .res-header {
+      background: var(--fd-dark);
+      padding: 20px 24px;
+    }
+    .res-header-brand {
+      font-size: 10px; font-weight: 600; color: rgba(244,63,94,0.7);
+      letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .res-header-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: white; }
+    .res-header-prov { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .res-header-concepto { font-size: 11px; color: rgba(244,63,94,0.7); margin-top: 3px; }
+
+    .res-body { padding: 0; }
+    .res-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 13px 24px;
+      border-bottom: 1px solid var(--fd-bg);
+    }
+    .res-row:last-child { border-bottom: none; }
+    .res-row-lbl { font-size: 12px; font-weight: 600; color: var(--fd-slate); display: flex; align-items: center; gap: 8px; }
+    .res-row-val { font-size: 13px; font-weight: 700; color: var(--fd-dark); }
+
+    .res-row.total-factura { background: #EFF6FF; }
+    .res-row.total-factura .res-row-lbl { color: #1D4ED8; font-weight: 700; }
+    .res-row.total-factura .res-row-val { color: #1D4ED8; font-size: 14px; }
+
+    .res-row.ret { background: #FFF8F9; }
+    .res-row.ret .res-row-val { color: var(--fd-pink); }
+    .res-row.ret.cero { background: var(--fd-bg); }
+    .res-row.ret.cero .res-row-lbl { color: var(--fd-slate-light); }
+    .res-row.ret.cero .res-row-val { color: var(--fd-slate-light); font-weight: 500; }
+
+    .res-row.total-ret { background: #FFF0F3; border-top: 1.5px solid rgba(244,63,94,0.15); }
+    .res-row.total-ret .res-row-lbl { color: var(--fd-pink); font-weight: 700; font-size: 13px; }
+    .res-row.total-ret .res-row-val { color: var(--fd-pink); font-size: 15px; }
+
+    .pct-tag {
+      display: inline-block;
+      background: var(--fd-pink); color: white;
+      border-radius: 5px; padding: 1px 7px;
+      font-size: 11px; font-weight: 700; margin-left: 6px;
+    }
+    .pct-tag.cero { background: rgba(203,213,225,0.5); color: var(--fd-slate); }
+    .cod-tag {
+      display: inline-block;
+      background: rgba(18,52,80,0.08); color: var(--fd-dark);
+      border-radius: 4px; padding: 1px 6px;
+      font-size: 10px; font-weight: 700; margin-left: 4px;
+    }
+
+    .res-divider {
+      height: 4px;
+      background: linear-gradient(90deg, var(--fd-pink-light), var(--fd-pink));
+    }
+
+    .res-total {
+      background: linear-gradient(135deg, var(--fd-dark) 0%, #1a3a5c 100%);
+      padding: 20px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .res-total-lbl { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); }
+    .res-total-val { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 800; color: white; }
+
+    /* ── ALERTAS ── */
+    .alerta {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 24px; font-size: 12px; font-weight: 500;
+      border-top: 1px solid var(--fd-bg);
+    }
+    .alerta svg { flex-shrink: 0; margin-top: 1px; }
+    .alerta.ok  { color: #15803D; background: #F0FDF4; }
+    .alerta.warn{ color: #92400E; background: #FFFBEB; }
+    .alerta.info{ color: #1D4ED8; background: #EFF6FF; }
+    .alerta.pink{ color: var(--fd-pink-dark); background: #FFF0F3; }
+
+    /* ── REFERENCIA ── */
+    .ref-section { margin-top: 24px; }
+    .ref-title {
+      font-size: 11px; font-weight: 700; color: var(--fd-slate-light);
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .ref-grid { grid-template-columns: 1fr; } }
+    .ref-card {
+      background: white; border-radius: 12px;
+      border: 1px solid rgba(203,213,225,0.3);
+      padding: 16px;
+    }
+    .ref-card-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 700; color: var(--fd-dark);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--fd-bg);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ref-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 11px; border-bottom: 1px solid var(--fd-bg); }
+    .ref-row:last-child { border-bottom: none; }
+    .ref-row span:first-child { color: var(--fd-slate); }
+    .ref-pct { font-weight: 700; color: var(--fd-pink); }
+    .ref-no  { font-weight: 700; color: #15803D; }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      font-size: 11px; color: var(--fd-slate-light);
+      text-align: center; margin-top: 16px; line-height: 1.6;
+    }
+
+    /* MOBILE - diseno nativo app */
+    @media (max-width: 768px) {
+      .page { padding: 0 0 80px; }
+      .container { max-width: 100%; }
+      .header { border-radius: 0; border: none; border-bottom: 1px solid rgba(203,213,225,0.25); margin-bottom: 0; padding: 12px 16px; box-shadow: 0 1px 6px rgba(15,23,42,0.08); position: sticky; top: 0; z-index: 100; }
+      .header-brand { font-size: 10px; letter-spacing: 3px; }
+      .header-title { font-size: 15px; }
+      .header-sub   { display: none; }
+      .header-badge { font-size: 10px; padding: 4px 10px; }
+      .card { border-radius: 0; border-left: none; border-right: none; margin-bottom: 6px; box-shadow: none; }
+      .card-header { padding: 12px 16px; gap: 10px; }
+      .card-body   { padding: 14px 16px 18px; }
+      .step-num  { width: 26px; height: 26px; font-size: 11px; }
+      .step-title{ font-size: 13px; }
+      .step-sub  { font-size: 10px; }
+      .ruc-row { flex-direction: column; gap: 10px; }
+      .ruc-row .input { height: 54px; font-size: 20px; letter-spacing: 3px; text-align: center; border-radius: 12px; }
+      .ruc-row .btn   { width: 100%; height: 48px; font-size: 14px; border-radius: 12px; }
+      .input  { height: 46px; font-size: 14px; border-radius: 10px; }
+      .select { height: 46px; font-size: 13px; border-radius: 10px; }
+      .field-label { font-size: 11px; }
+      .concepto-badge { padding: 12px 14px; border-radius: 10px; }
+      .badge-pct  { font-size: 26px; }
+      .badge-desc { font-size: 12px; }
+      .iva-hint   { font-size: 11px; }
+      .tipo-btn   { padding: 12px 8px; font-size: 12px; border-radius: 10px; }
+      .tipo-btn svg { width: 22px; height: 22px; margin-bottom: 5px; }
+      .montos-grid { grid-template-columns: 1fr; gap: 12px; }
+      .iva-btn { width: 100%; justify-content: center; padding: 7px 12px; font-size: 11px; }
+      .btn-full { height: 54px !important; font-size: 14px !important; border-radius: 12px !important; margin-top: 14px !important; }
+      .prov-card { padding: 12px 14px; border-radius: 10px; margin-top: 10px; }
+      .prov-name { font-size: 14px; }
+      .prov-ruc  { font-size: 10px; }
+      .pill      { font-size: 10px; padding: 2px 8px; }
+      .prov-actividad { font-size: 10px; }
+      .section-label { font-size: 10px; letter-spacing: 1.5px; }
+      #resultado { margin-top: 6px; }
+      .res-card { border-radius: 0; border-left: none; border-right: none; box-shadow: none; }
+      .res-header { padding: 14px 16px; }
+      .res-header-brand { font-size: 9px; letter-spacing: 2px; }
+      .res-header-title { font-size: 13px; }
+      .res-header-prov  { font-size: 10px; }
+      .res-header-concepto { font-size: 10px; }
+      .res-row       { padding: 10px 16px; }
+      .res-row-lbl   { font-size: 11px; gap: 6px; }
+      .res-row-val   { font-size: 12px; }
+      .res-row.total-factura .res-row-val { font-size: 13px; }
+      .res-row.total-ret { padding: 12px 16px; }
+      .res-row.total-ret .res-row-lbl { font-size: 11px; }
+      .res-row.total-ret .res-row-val { font-size: 15px; }
+      .pct-tag { font-size: 10px; padding: 1px 6px; margin-left: 4px; }
+      .cod-tag { font-size: 9px; }
+      .res-total     { padding: 14px 16px; }
+      .res-total-lbl { font-size: 11px; }
+      .res-total-val { font-size: 22px; }
+      .alerta        { padding: 10px 16px; font-size: 11px; }
+      .ref-section   { margin-top: 12px; padding: 0 16px 16px; }
+      .ref-grid      { grid-template-columns: 1fr; gap: 8px; }
+      .ref-card      { padding: 12px; border-radius: 10px; }
+      .ref-card-title{ font-size: 11px; }
+      .ref-row       { font-size: 11px; padding: 4px 0; }
+      .footer-note   { font-size: 10px; padding: 0 16px; margin-top: 10px; }
+      .form-error    { font-size: 11px; padding: 10px 12px; border-radius: 10px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+<div class="container">
+
+  <!-- ── HEADER ── -->
+  <div class="header">
+    <div>
+      <div class="header-brand">FOODIX</div>
+      <h1 class="header-title">Calculadora de Retenciones</h1>
+      <div class="header-sub">Vigente desde 01/03/2026 &nbsp;·&nbsp; NAC-DGERCGC26-00000009</div>
+    </div>
+    <span class="header-badge">2026</span>
+  </div>
+
+  <!-- ── PASO 1: PROVEEDOR ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num" id="num1">1</div>
+      <div>
+        <div class="step-title">¿A quién le compras?</div>
+        <div class="step-sub">Ingresa el RUC del proveedor</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="section-label">RUC del proveedor</div>
+      <div class="section-divider"></div>
+      <div class="ruc-row">
+        <input class="input" id="ruc" type="text" maxlength="13" placeholder="Ej: 1793168604001"
+               oninput="this.value=this.value.replace(/\D/g,'')"
+               onkeydown="if(event.key==='Enter') buscarProveedor()">
+        <button class="btn btn-primary" onclick="buscarProveedor()" id="btn-buscar">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Consultar
+        </button>
+      </div>
+
+      <!-- Info proveedor -->
+      <div class="prov-card" id="prov-info">
+        <div class="prov-name" id="prov-nombre"></div>
+        <div class="prov-ruc" id="prov-ruc"></div>
+        <div class="pills" id="prov-pills"></div>
+        <div class="prov-actividad" id="prov-actividad"></div>
+      </div>
+
+      <!-- Seleccion manual -->
+      <div class="manual-wrap" id="manual-tipo">
+        <div class="manual-label">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+          Selecciona el tipo manualmente
+        </div>
+        <select class="select" id="tipo-manual" onchange="onManualTipo()">
+          <option value="">-- Selecciona una opcion --</option>
+          <optgroup label="SOCIEDADES">
+            <option value="SOCIEDAD|NO|NO|GENERAL|NO">Sociedad comun (Cia. Ltda., S.A., S.A.S.)</option>
+            <option value="SOCIEDAD|SI|NO|GENERAL|NO">Contribuyente Especial (Pronaca, Coca-Cola...)</option>
+            <option value="SOCIEDAD|NO|NO|GENERAL|SI">Gran Contribuyente — 0% IR y 0% IVA</option>
+            <option value="PUBLICA|NO|NO|PUBLICA|NO">Entidad / Empresa Publica (CNEL, EEQ)</option>
+          </optgroup>
+          <optgroup label="PERSONA NATURAL">
+            <option value="PERSONA NATURAL|NO|SI|GENERAL|NO">PN Obligada a llevar contabilidad</option>
+            <option value="PERSONA NATURAL|NO|NO|GENERAL|NO">PN NO Obligada (pequeno negocio)</option>
+            <option value="PERSONA NATURAL|NO|NO|RIMPE|NO">RIMPE Emprendedor</option>
+            <option value="PERSONA NATURAL|NO|NO|RIMPE NEGOCIO POPULAR|NO">RIMPE Negocio Popular (preimpreso)</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PASO 2: CONCEPTO ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num" id="num2">2</div>
+      <div>
+        <div class="step-title">¿Qué estás comprando / pagando?</div>
+        <div class="step-sub">Tipo de pago para determinar la retención</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="section-label">Concepto de pago</div>
+      <div class="section-divider"></div>
+      <select class="select" id="concepto" onchange="onConcepto()">
+        <option value="">-- Selecciona el concepto --</option>
+        {% for grupo, items in grupos.items() %}
+        <optgroup label="── {{ grupo }}">
+          {% for c in items %}
+          <option value="{{ c.cod }}" data-pct="{{ c.pct_ir }}" data-tipo="{{ c.tipo }}">
+            {% if c.pct_ir == 0 %}0%{% else %}{{ c.pct_ir }}%{% endif %} &nbsp;—&nbsp; {{ c.desc }}
+          </option>
+          {% endfor %}
+        </optgroup>
+        {% endfor %}
+      </select>
+
+      <!-- Badge concepto -->
+      <div class="concepto-badge" id="concepto-badge">
+        <div style="display:flex;align-items:flex-start;gap:16px">
+          <div>
+            <div class="badge-pct" id="badge-pct"></div>
+            <div class="badge-pct-label">% Retención IR</div>
+          </div>
+          <div style="flex:1">
+            <div class="badge-desc" id="badge-desc"></div>
+            <span class="cod-chip" id="badge-cod"></span>
+            <div class="iva-hint" id="badge-iva-hint"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bien / Servicio -->
+      <div style="margin-top:16px">
+        <div class="section-label">¿Bien o servicio?</div>
+        <div class="section-divider"></div>
+        <div class="tipo-toggle">
+          <div class="tipo-btn active" id="btn-bien" onclick="setTipo('bien')">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+            Bien / Insumo
+          </div>
+          <div class="tipo-btn" id="btn-servicio" onclick="setTipo('servicio')">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            Servicio
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PASO 3: MONTOS ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num" id="num3">3</div>
+      <div>
+        <div class="step-title">Montos de la factura</div>
+        <div class="step-sub">Subtotal sin IVA y valor del IVA</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="section-label">Valores</div>
+      <div class="section-divider"></div>
+      <div class="montos-grid">
+        <div>
+          <label class="field-label">Subtotal sin IVA (base imponible)</label>
+          <div class="input-prefix">
+            <input class="input" id="subtotal" type="number" step="0.01" min="0" placeholder="0.00" oninput="onSubtotal()">
+          </div>
+          <div style="font-size:11px;color:var(--fd-slate-light);margin-top:6px">El valor ANTES del IVA en la factura</div>
+        </div>
+        <div>
+          <label class="field-label">Valor del IVA en la factura</label>
+          <div class="input-prefix">
+            <input class="input" id="iva-valor" type="number" step="0.01" min="0" placeholder="0.00">
+          </div>
+          <button class="iva-btn" onclick="calcularIVA15()">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Calcular IVA 15% automático
+          </button>
+        </div>
+      </div>
+
+      <div class="form-error" id="form-error">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        <span id="form-error-txt"></span>
+      </div>
+
+      <button class="btn btn-primary btn-full" style="margin-top:16px;font-size:14px;height:52px" onclick="calcular()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        CALCULAR RETENCIONES
+      </button>
+    </div>
+  </div>
+
+  <!-- ── RESULTADO ── -->
+  <div id="resultado">
+    <div class="res-card">
+      <div class="res-header">
+        <div class="res-header-brand">COMPROBANTE DE RETENCIÓN</div>
+        <div class="res-header-title" id="res-prov"></div>
+        <div class="res-header-concepto" id="res-concepto"></div>
+      </div>
+
+      <div class="res-body">
+        <!-- Base -->
+        <div class="res-row">
+          <span class="res-row-lbl">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+            Subtotal (base imponible)
+          </span>
+          <span class="res-row-val" id="res-subtotal"></span>
+        </div>
+        <div class="res-row">
+          <span class="res-row-lbl">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            IVA
+          </span>
+          <span class="res-row-val" id="res-iva"></span>
+        </div>
+        <div class="res-row total-factura">
+          <span class="res-row-lbl">Total de la factura</span>
+          <span class="res-row-val" id="res-total-fact"></span>
+        </div>
+
+        <div class="res-divider"></div>
+
+        <!-- Retenciones -->
+        <div class="res-row ret" id="row-ir">
+          <span class="res-row-lbl" id="lbl-ir">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Retención Renta (IR)
+          </span>
+          <span class="res-row-val" id="res-ir"></span>
+        </div>
+        <div class="res-row ret" id="row-iva">
+          <span class="res-row-lbl" id="lbl-iva">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Retención IVA
+          </span>
+          <span class="res-row-val" id="res-iva-ret"></span>
+        </div>
+
+        <!-- TOTAL RETENCIONES -->
+        <div class="res-row total-ret" id="row-total-ret">
+          <span class="res-row-lbl">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+            TOTAL RETENCIÓN (IR + IVA)
+          </span>
+          <span class="res-row-val" id="res-total-ret"></span>
+        </div>
+
+        <!-- Alertas -->
+        <div id="res-alertas"></div>
+      </div>
+
+      <!-- Total a pagar -->
+      <div class="res-total">
+        <div>
+          <div class="res-total-lbl">TOTAL A PAGAR AL PROVEEDOR</div>
+        </div>
+        <div class="res-total-val" id="res-total-pagar"></div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      IR se calcula sobre el subtotal &nbsp;·&nbsp; IVA retenido sobre el valor del IVA &nbsp;·&nbsp; Emitir comprobante en 5 días hábiles
+    </div>
+  </div>
+
+  <!-- ── REFERENCIA RÁPIDA ── -->
+  <div class="ref-section" id="ref-section">
+    <div class="ref-title">Referencia rápida 2026</div>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <div class="ref-card-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 019 9v.375M10.125 2.25A3.375 3.375 0 0113.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 013.375 3.375M9 15l2.25 2.25L15 12"/></svg>
+          % Retención Renta (IR)
+        </div>
+        <div class="ref-row"><span>RIMPE Negocio Popular</span><span class="ref-pct" style="color:#15803D">0%</span></div>
+        <div class="ref-row"><span>Transporte / Agrícola productor / RIMPE</span><span class="ref-pct">1%</span></div>
+        <div class="ref-row"><span>Agrícola comercializador</span><span class="ref-pct">1.75%</span></div>
+        <div class="ref-row"><span>Bienes muebles, Energía, Seguros</span><span class="ref-pct">2%</span></div>
+        <div class="ref-row"><span>Servicios PN, Publicidad, Liquidaciones</span><span class="ref-pct">3%</span></div>
+        <div class="ref-row"><span>Servicios / comisiones de Sociedades</span><span class="ref-pct">5%</span></div>
+        <div class="ref-row"><span>Honorarios PN, Arrendamientos</span><span class="ref-pct">10%</span></div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+          Retención IVA — ¿Cuándo aplica?
+        </div>
+        <div class="ref-row"><span>Gran Contribuyente</span><span class="ref-no">NO</span></div>
+        <div class="ref-row"><span>Contribuyente Especial</span><span class="ref-no">NO</span></div>
+        <div class="ref-row"><span>Sociedad / PN Obligada / RIMPE — bienes</span><span class="ref-pct">30%</span></div>
+        <div class="ref-row"><span>Sociedad / PN Obligada / RIMPE — servicios</span><span class="ref-pct">70%</span></div>
+        <div class="ref-row"><span>PN NO Obligada — bienes</span><span class="ref-pct">30%</span></div>
+        <div class="ref-row"><span>PN NO Obligada — servicios</span><span class="ref-pct">70%</span></div>
+        <div class="ref-row"><span>Liquidación / Honorarios / Arriendo</span><span class="ref-pct">100%</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</div><!-- /page -->
+
+<script>
+let prov = null;
+let tipoCompra = 'bien';
+
+// ── RUC / Proveedor ──
+async function buscarProveedor() {
+  const ruc = document.getElementById('ruc').value.trim();
+  const info = document.getElementById('prov-info');
+  const manual = document.getElementById('manual-tipo');
+  const btn = document.getElementById('btn-buscar');
+
+  if (ruc.length !== 13) {
+    mostrarProvError('El RUC debe tener exactamente 13 dígitos.');
+    return;
+  }
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="16" height="16" class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Buscando...';
+  info.style.display = 'none';
+  manual.style.display = 'none';
+
+  try {
+    const res = await fetch(`/api/proveedor/${ruc}`);
+    const data = await res.json();
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Consultar';
+
+    if (!res.ok) {
+      mostrarProvWarn('RUC no encontrado en la base. Selecciona el tipo manualmente:');
+      manual.style.display = 'block';
+      prov = null; actualizarHint(); return;
+    }
+
+    prov = data;
+    manual.style.display = 'none';
+
+    const estadoOk = (data.estado || '').toUpperCase() === 'ACTIVO';
+    info.className = 'prov-card ok';
+    info.style.display = 'block';
+    document.getElementById('prov-nombre').textContent = data.razon_social || ruc;
+    document.getElementById('prov-ruc').textContent = 'RUC: ' + data.ruc;
+
+    let pills = `
+      <span class="pill pill-estado-${estadoOk ? 'ok' : 'bad'}">${data.estado || '—'}</span>
+      <span class="pill pill-tipo">${data.tipo_persona || '—'}</span>
+      <span class="pill pill-regimen">${data.regimen || '—'}</span>
+      ${data.contribuyente_especial === 'SI' ? '<span class="pill pill-ce">Contrib. Especial</span>' : ''}
+      ${(data.gran_contribuyente||'NO') === 'SI' ? '<span class="pill pill-gc">Gran Contribuyente</span>' : ''}
+      ${data.obligado_contabilidad === 'SI' ? '<span class="pill pill-obl">Oblig. Contab.</span>' : ''}
+    `;
+    document.getElementById('prov-pills').innerHTML = pills;
+
+    const act = data.actividad_economica || '';
+    document.getElementById('prov-actividad').textContent =
+      act && act !== 'PERSONA NATURAL' ? act.substring(0,100) + (act.length>100?'…':'') : '';
+
+    document.getElementById('num1').className = 'step-num done';
+    actualizarHint();
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Consultar';
+    mostrarProvError('Error de conexión: ' + e.message);
+  }
+}
+
+function mostrarProvError(msg) {
+  const info = document.getElementById('prov-info');
+  info.className = 'prov-card err';
+  info.style.display = 'block';
+  info.innerHTML = `<div style="color:var(--fd-pink);font-size:13px;font-weight:600">${msg}</div>`;
+}
+function mostrarProvWarn(msg) {
+  const info = document.getElementById('prov-info');
+  info.className = 'prov-card warn';
+  info.style.display = 'block';
+  info.innerHTML = `<div style="color:#92400E;font-size:13px;font-weight:600">${msg}</div>`;
+}
+
+function onManualTipo() {
+  const val = document.getElementById('tipo-manual').value;
+  if (!val) { prov = null; actualizarHint(); return; }
+  const [tp, ce, obl, reg, gc] = val.split('|');
+  prov = { tipo_persona: tp, contribuyente_especial: ce, obligado_contabilidad: obl, regimen: reg, gran_contribuyente: gc||'NO', razon_social: '(manual)', ruc: '' };
+  document.getElementById('num1').className = 'step-num done';
+  actualizarHint();
+}
+
+// ── Concepto ──
+function onConcepto() {
+  const sel = document.getElementById('concepto');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) { document.getElementById('concepto-badge').style.display = 'none'; return; }
+
+  const tipo = opt.getAttribute('data-tipo');
+  const pct  = parseFloat(opt.getAttribute('data-pct'));
+
+  if (tipo === 'bien') setTipo('bien');
+  else if (tipo === 'servicio') setTipo('servicio');
+
+  const badge = document.getElementById('concepto-badge');
+  badge.style.display = 'block';
+  document.getElementById('badge-pct').textContent = pct + '%';
+  document.getElementById('badge-desc').textContent = opt.text.replace(/^\d+(\.\d+)?%\s*—\s*/, '');
+  document.getElementById('badge-cod').textContent = 'Código ' + opt.value;
+  document.getElementById('num2').className = 'step-num done';
+  actualizarHint();
+}
+
+function setTipo(t) {
+  tipoCompra = t;
+  document.getElementById('btn-bien').className = 'tipo-btn' + (t==='bien' ? ' active' : '');
+  document.getElementById('btn-servicio').className = 'tipo-btn' + (t==='servicio' ? ' active' : '');
+  actualizarHint();
+}
+
+function actualizarHint() {
+  const el = document.getElementById('badge-iva-hint');
+  if (!el) return;
+  const cod = document.getElementById('concepto').value;
+  if (!cod || !prov) { el.textContent = ''; return; }
+  const piva = calcPctIva(prov.tipo_persona, prov.contribuyente_especial, prov.obligado_contabilidad, prov.regimen, cod, tipoCompra, prov.gran_contribuyente);
+  if (piva === 0) {
+    el.innerHTML = '<span style="color:#15803D;font-weight:600">✓ Retención IVA: NO APLICA</span>';
+  } else {
+    el.innerHTML = `<span style="color:var(--fd-pink);font-weight:600">Retención IVA: <strong>${piva}%</strong> sobre el valor del IVA</span>`;
+  }
+}
+
+function calcPctIva(tp, ce, obl, reg, cod, tipo, gc) {
+  if ((gc||'NO').toUpperCase() === 'SI') return 0;
+  if (cod === '311') return 100;
+  if (['303','304','304E'].includes(cod)) return 100;
+  if (cod === '320') return 100;
+  if (['COMBUSTIBLE','332'].includes(cod)) return 0;
+  if ((ce||'').toUpperCase() === 'SI') return 0;
+  return tipo === 'bien' ? 30 : 70;
+}
+
+// ── Montos ──
+function onSubtotal() { document.getElementById('num3').className = 'step-num done'; }
+function calcularIVA15() {
+  const sub = parseFloat(document.getElementById('subtotal').value) || 0;
+  if (sub > 0) document.getElementById('iva-valor').value = (sub * 0.15).toFixed(2);
+}
+
+// ── Calcular ──
+async function calcular() {
+  const errDiv = document.getElementById('form-error');
+  errDiv.style.display = 'none';
+
+  const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
+  const ivaVal   = parseFloat(document.getElementById('iva-valor').value) || 0;
+  const cod      = document.getElementById('concepto').value;
+
+  if (!prov)      { mostrarError('Primero consulta el RUC del proveedor (Paso 1)'); return; }
+  if (!cod)       { mostrarError('Selecciona el concepto de pago (Paso 2)'); return; }
+  if (subtotal<=0){ mostrarError('Ingresa el subtotal de la factura (Paso 3)'); return; }
+
+  try {
+    const res = await fetch('/api/calcular', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        subtotal, iva_valor: ivaVal, concepto_cod: cod, tipo_compra: tipoCompra,
+        tipo_persona: prov.tipo_persona, contribuyente_especial: prov.contribuyente_especial,
+        obligado_contabilidad: prov.obligado_contabilidad, regimen: prov.regimen,
+        gran_contribuyente: prov.gran_contribuyente || 'NO',
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { mostrarError(data.error); return; }
+    renderResultado(data);
+  } catch(e) { mostrarError('Error de conexión: ' + e.message); }
+}
+
+function mostrarError(msg) {
+  const d = document.getElementById('form-error');
+  document.getElementById('form-error-txt').textContent = msg;
+  d.style.display = 'flex';
+}
+
+function fmt(v) {
+  return '$' + parseFloat(v).toLocaleString('es-EC', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function renderResultado(d) {
+  document.getElementById('resultado').style.display = 'block';
+  document.getElementById('ref-section').style.display = 'none';
+  document.getElementById('resultado').scrollIntoView({behavior:'smooth', block:'start'});
+
+  // Header
+  document.getElementById('res-prov').textContent =
+    (prov?.razon_social || '') + (prov?.ruc ? '  ·  RUC ' + prov.ruc : '');
+  document.getElementById('res-concepto').textContent = d.concepto_desc;
+
+  // Base
+  document.getElementById('res-subtotal').textContent = fmt(d.subtotal);
+  document.getElementById('res-iva').textContent = d.iva_valor > 0 ? fmt(d.iva_valor) : '$0.00 (sin IVA)';
+  document.getElementById('res-total-fact').textContent = fmt(d.total_factura);
+
+  // IR
+  const rowIR = document.getElementById('row-ir');
+  const lblIR = document.getElementById('lbl-ir');
+  const valIR = document.getElementById('res-ir');
+  if (d.pct_ir === 0) {
+    rowIR.className = 'res-row ret cero';
+    lblIR.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Retención Renta (IR) <span class="pct-tag cero">0%</span>`;
+    valIR.textContent = 'NO APLICA';
+  } else {
+    rowIR.className = 'res-row ret';
+    lblIR.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Retención Renta (IR) <span class="pct-tag">${d.pct_ir}%</span><span class="cod-tag">Cód. ${d.concepto_cod}</span>`;
+    valIR.textContent = '(' + fmt(d.ret_ir) + ')';
+  }
+
+  // IVA
+  const rowIVA = document.getElementById('row-iva');
+  const lblIVA = document.getElementById('lbl-iva');
+  const valIVA = document.getElementById('res-iva-ret');
+  if (d.pct_iva === 0) {
+    rowIVA.className = 'res-row ret cero';
+    lblIVA.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Retención IVA <span class="pct-tag cero">NO APLICA</span>`;
+    valIVA.textContent = '—';
+  } else {
+    rowIVA.className = 'res-row ret';
+    lblIVA.innerHTML = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Retención IVA <span class="pct-tag">${d.pct_iva}%</span>`;
+    valIVA.textContent = d.iva_valor > 0 ? '(' + fmt(d.ret_iva) + ')' : '($0.00 — sin IVA)';
+  }
+
+  // TOTAL RETENCIÓN
+  const totalRet = d.ret_ir + d.ret_iva;
+  document.getElementById('res-total-ret').textContent = '(' + fmt(totalRet) + ')';
+
+  // Total a pagar
+  document.getElementById('res-total-pagar').textContent = fmt(d.total_pagar);
+
+  // Alertas
+  const alertDiv = document.getElementById('res-alertas');
+  const alertas = [];
+  if ((prov?.gran_contribuyente||'NO').toUpperCase() === 'SI')
+    alertas.push({cls:'pink', msg:'<b>Gran Contribuyente:</b> No se retiene IR ni IVA.'});
+  if ((prov?.contribuyente_especial||'').toUpperCase() === 'SI')
+    alertas.push({cls:'warn', msg:'<b>Contribuyente Especial:</b> FOODIX no retiene IVA — ellos son agentes de retención.'});
+  if (d.concepto_cod === '311')
+    alertas.push({cls:'warn', msg:'<b>Liquidación de compra:</b> IVA 100% — el productor no tiene RUC.'});
+  if (d.concepto_cod === 'COMBUSTIBLE')
+    alertas.push({cls:'info', msg:'<b>Combustible:</b> No se retiene IR ni IVA.'});
+  if (d.concepto_cod === '332')
+    alertas.push({cls:'info', msg:'<b>RIMPE Negocio Popular:</b> 0% IR — emiten comprobante preimpreso.'});
+
+  alertDiv.innerHTML = alertas.map(a =>
+    `<div class="alerta ${a.cls}">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+      <span>${a.msg}</span>
+    </div>`
+  ).join('');
+}
+
+document.getElementById('ruc').addEventListener('keydown', e => { if(e.key==='Enter') buscarProveedor(); });
+</script>
+</body>
+</html>
