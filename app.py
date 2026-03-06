@@ -122,7 +122,7 @@ def buscar_proveedor(ruc):
             SELECT ruc, razon_social, tipo_persona, regimen,
                    contribuyente_especial, obligado_contabilidad,
                    agente_retencion, estado, actividad_economica, gran_contribuyente
-            FROM public.proveedores_sri WHERE ruc = %s
+            FROM public."GFC-Prov-Proveedores" WHERE ruc = %s
         ''', (ruc,))
         row = cur.fetchone()
         cur.close(); conn.close()
@@ -147,7 +147,7 @@ def registrar_ruc():
     try:
         conn = get_conn(); cur = conn.cursor()
         cur.execute('''
-            INSERT INTO public.proveedores_sri (ruc)
+            INSERT INTO public."GFC-Prov-Proveedores" (ruc)
             VALUES (%s)
             ON CONFLICT (ruc) DO NOTHING
         ''', (ruc,))
