@@ -8,16 +8,14 @@ import urllib.request
 app = Flask(__name__)
 
 def keep_alive():
-    time.sleep(30)
-    url = os.environ.get('RENDER_EXTERNAL_URL', '')
-    if not url:
-        return
+    time.sleep(10)
+    url = (os.environ.get('RENDER_EXTERNAL_URL') or 'https://gfc-ret-retenciones.onrender.com').rstrip('/')
     while True:
         try:
-            urllib.request.urlopen(url + '/ping', timeout=10)
+            urllib.request.urlopen(url + '/ping', timeout=15)
         except:
             pass
-        time.sleep(600)
+        time.sleep(300)  # cada 5 minutos
 
 threading.Thread(target=keep_alive, daemon=True).start()
 

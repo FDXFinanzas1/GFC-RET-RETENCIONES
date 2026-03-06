@@ -9,3 +9,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: RENDER_EXTERNAL_URL
+        value: https://gfc-ret-retenciones.onrender.com
