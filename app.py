@@ -1,8 +1,25 @@
 from flask import Flask, render_template, request, jsonify
 import psycopg2
 import os
+import threading
+import time
+import urllib.request
 
 app = Flask(__name__)
+
+def keep_alive():
+    time.sleep(30)
+    url = os.environ.get('RENDER_EXTERNAL_URL', '')
+    if not url:
+        return
+    while True:
+        try:
+            urllib.request.urlopen(url + '/ping', timeout=10)
+        except:
+            pass
+        time.sleep(600)
+
+threading.Thread(target=keep_alive, daemon=True).start()
 
 DB_CONFIG = {
     'host': os.environ.get('DB_HOST', 'chiosburguer.postgres.database.azure.com'),
