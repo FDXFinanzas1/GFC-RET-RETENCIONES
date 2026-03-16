@@ -3,6 +3,7 @@ import psycopg2
 import os
 import threading
 import time
+import json
 import urllib.request
 
 app = Flask(__name__)
@@ -97,6 +98,71 @@ def get_conn():
         cfg = DB_CONFIG.copy(); cfg['host'] = '4.246.223.171'
         return psycopg2.connect(**cfg)
 
+
+SRI_API_URL = 'https://srienlinea.sri.gob.ec/sri-catastro-sujeto-servicio-internet/rest/ConsolidadoContribuyente/obtenerPorNumerosRuc'
+
+def consultar_sri_api(ruc):
+    """Consulta la API del SRI en tiempo real y retorna dict con datos del contribuyente."""
+    try:
+        url = f'{SRI_API_URL}?ruc={ruc}'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'application/json',
+        })
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+        if not data or not isinstance(data, list) or len(data) == 0:
+            return None
+        d = data[0]
+        return {
+            'ruc': d.get('numeroRuc', ruc),
+            'razon_social': d.get('razonSocial', ''),
+            'estado': d.get('estadoContribuyenteRuc', ''),
+            'tipo_persona': d.get('tipoContribuyente', ''),
+            'regimen': d.get('regimen', ''),
+            'obligado_contabilidad': d.get('obligadoLlevarContabilidad', 'NO'),
+            'agente_retencion': d.get('agenteRetencion', 'NO'),
+            'contribuyente_especial': d.get('contribuyenteEspecial', 'NO'),
+            'actividad_economica': d.get('actividadEconomicaPrincipal', ''),
+            'gran_contribuyente': 'NO',
+        }
+    except Exception:
+        return None
+
+
+def guardar_en_catastro(conn, datos):
+    """Guarda los datos consultados del SRI en la tabla SRI_Catastro_RUC."""
+    try:
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO public."SRI_Catastro_RUC"
+                (ruc, razon_social, estado, tipo_persona, regimen,
+                 obligado_contabilidad, agente_retencion, contribuyente_especial,
+                 actividad_economica, gran_contribuyente)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON CONFLICT (ruc) DO UPDATE SET
+                razon_social = EXCLUDED.razon_social,
+                estado = EXCLUDED.estado,
+                tipo_persona = EXCLUDED.tipo_persona,
+                regimen = EXCLUDED.regimen,
+                obligado_contabilidad = EXCLUDED.obligado_contabilidad,
+                agente_retencion = EXCLUDED.agente_retencion,
+                contribuyente_especial = EXCLUDED.contribuyente_especial,
+                actividad_economica = EXCLUDED.actividad_economica,
+                fecha_carga = CURRENT_TIMESTAMP
+        ''', (
+            datos['ruc'], datos['razon_social'], datos['estado'],
+            datos['tipo_persona'], datos['regimen'],
+            datos['obligado_contabilidad'], datos['agente_retencion'],
+            datos['contribuyente_especial'], datos['actividad_economica'],
+            datos['gran_contribuyente'],
+        ))
+        conn.commit()
+        cur.close()
+    except Exception:
+        pass
+
+
 @app.route('/ping')
 def ping():
     return 'ok', 200
@@ -118,6 +184,7 @@ def buscar_proveedor(ruc):
         return jsonify({'error': 'RUC invalido — debe tener exactamente 13 digitos numericos'}), 400
     try:
         conn = get_conn(); cur = conn.cursor()
+        # Buscar primero en proveedores FOODIX
         cur.execute('''
             SELECT ruc, razon_social, tipo_persona, regimen,
                    contribuyente_especial, obligado_contabilidad,
@@ -125,15 +192,39 @@ def buscar_proveedor(ruc):
             FROM public."GFC-Prov-Proveedores" WHERE ruc = %s
         ''', (ruc,))
         row = cur.fetchone()
-        cur.close(); conn.close()
+        fuente = 'proveedores'
+
+        # Capa 2: buscar en catastro SRI (datos abiertos)
         if not row:
-            return jsonify({'error': 'RUC no encontrado en el registro de proveedores FOODIX'}), 404
+            cur.execute('''
+                SELECT ruc, razon_social, tipo_persona, regimen,
+                       contribuyente_especial, obligado_contabilidad,
+                       agente_retencion, estado, actividad_economica, gran_contribuyente
+                FROM public."SRI_Catastro_RUC" WHERE ruc = %s
+            ''', (ruc,))
+            row = cur.fetchone()
+            fuente = 'catastro_sri'
+
+        # Capa 3: consultar API del SRI en tiempo real y guardar en BD
+        if not row:
+            cur.close()
+            datos_sri = consultar_sri_api(ruc)
+            if datos_sri:
+                guardar_en_catastro(conn, datos_sri)
+                conn.close()
+                datos_sri['fuente'] = 'sri_en_linea'
+                return jsonify(datos_sri)
+            conn.close()
+            return jsonify({'error': 'RUC no encontrado — no existe en el SRI'}), 404
+
+        cur.close(); conn.close()
         return jsonify({
             'ruc': row[0], 'razon_social': row[1], 'tipo_persona': row[2],
             'regimen': row[3], 'contribuyente_especial': row[4],
             'obligado_contabilidad': row[5], 'agente_retencion': row[6],
             'estado': row[7], 'actividad_economica': row[8],
             'gran_contribuyente': row[9] or 'NO',
+            'fuente': fuente,
         })
     except Exception as e:
         return jsonify({'error': f'Error de conexion: {str(e)[:120]}'}), 500
