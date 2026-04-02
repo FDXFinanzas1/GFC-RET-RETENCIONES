@@ -329,6 +329,7 @@
     .pill-regimen     { background: #F5F3FF; color: #6D28D9; }
     .pill-ce          { background: #FFF7ED; color: #C2410C; }
     .pill-gc          { background: #FDF2F8; color: #9D174D; }
+    .pill-exp         { background: #ECFDF5; color: #065F46; }
     .pill-obl         { background: #F0FDF4; color: #15803D; }
     .prov-actividad   { font-size: 11px; color: var(--fd-slate-light); margin-top: 8px; line-height: 1.4; }
 
@@ -873,6 +874,7 @@
           Retención IVA — ¿Cuándo aplica?
         </div>
         <div class="ref-row"><span>Gran Contribuyente</span><span class="ref-no">NO</span></div>
+        <div class="ref-row"><span>Exportador Habitual de Bienes</span><span class="ref-no">NO</span></div>
         <div class="ref-row"><span>Contribuyente Especial</span><span class="ref-no">NO</span></div>
         <div class="ref-row"><span>Sociedad / PN Obligada / RIMPE — bienes</span><span class="ref-pct">30%</span></div>
         <div class="ref-row"><span>Sociedad / PN Obligada / RIMPE — servicios</span><span class="ref-pct">70%</span></div>
@@ -953,6 +955,7 @@ async function buscarProveedor() {
       <span class="pill pill-regimen">${data.regimen || '—'}</span>
       ${data.contribuyente_especial === 'SI' ? '<span class="pill pill-ce">Contrib. Especial</span>' : ''}
       ${(data.gran_contribuyente||'NO') === 'SI' ? '<span class="pill pill-gc">Gran Contribuyente</span>' : ''}
+      ${(data.exportador_bienes||'NO') === 'SI' ? '<span class="pill pill-exp">Exportador Habitual</span>' : ''}
       ${data.obligado_contabilidad === 'SI' ? '<span class="pill pill-obl">Oblig. Contab.</span>' : ''}
     `;
     document.getElementById('prov-pills').innerHTML = pills;
@@ -992,6 +995,13 @@ async function buscarProveedor() {
       ce.style.cssText = 'margin-top:10px;padding:12px 14px;background:#FFF7ED;border:1.5px solid #F97316;border-radius:8px;color:#9A3412;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px';
       ce.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg> CONTRIBUYENTE ESPECIAL — Solo se retiene IR según el concepto. No se retiene IVA.';
       document.getElementById('prov-actividad').after(ce);
+    }
+
+    if ((data.exportador_bienes||'NO') === 'SI' && (data.gran_contribuyente||'NO') !== 'SI') {
+      const exp = document.createElement('div');
+      exp.style.cssText = 'margin-top:10px;padding:12px 14px;background:#ECFDF5;border:1.5px solid #10B981;border-radius:8px;color:#065F46;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px';
+      exp.innerHTML = '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> EXPORTADOR HABITUAL DE BIENES — No se retiene IVA (Res. NAC-DGERCGC20-00000061). El IR sí se retiene normalmente.';
+      document.getElementById('prov-actividad').after(exp);
     }
 
     document.getElementById('num1').className = 'step-num done';
@@ -1237,7 +1247,7 @@ function actualizarHint() {
   if (!el) return;
   const cod = document.getElementById('concepto').value;
   if (!cod || !prov) { el.textContent = ''; return; }
-  const piva = calcPctIva(prov.tipo_persona, prov.contribuyente_especial, prov.obligado_contabilidad, prov.regimen, cod, tipoCompra, prov.gran_contribuyente);
+  const piva = calcPctIva(prov.tipo_persona, prov.contribuyente_especial, prov.obligado_contabilidad, prov.regimen, cod, tipoCompra, prov.gran_contribuyente, prov.exportador_bienes);
   if (piva === 0) {
     el.innerHTML = '<span style="color:#15803D;font-weight:600">✓ Retención IVA: NO APLICA</span>';
   } else {
@@ -1245,8 +1255,9 @@ function actualizarHint() {
   }
 }
 
-function calcPctIva(tp, ce, obl, reg, cod, tipo, gc) {
+function calcPctIva(tp, ce, obl, reg, cod, tipo, gc, exp) {
   if ((gc||'NO').toUpperCase() === 'SI') return 0;
+  if ((exp||'NO').toUpperCase() === 'SI') return 0;
   if (cod === '311') return 100;
   if (['303','304','304E'].includes(cod)) return 100;
   if (cod === '320') return 100;
@@ -1285,6 +1296,7 @@ async function calcular() {
         tipo_persona: prov.tipo_persona, contribuyente_especial: prov.contribuyente_especial,
         obligado_contabilidad: prov.obligado_contabilidad, regimen: prov.regimen,
         gran_contribuyente: prov.gran_contribuyente || 'NO',
+        exportador_bienes: prov.exportador_bienes || 'NO',
       })
     });
     const data = await res.json();
@@ -1358,6 +1370,8 @@ function renderResultado(d) {
   const alertas = [];
   if ((prov?.gran_contribuyente||'NO').toUpperCase() === 'SI')
     alertas.push({cls:'pink', msg:'<b>Gran Contribuyente:</b> No se retiene IR ni IVA.'});
+  if ((prov?.exportador_bienes||'NO').toUpperCase() === 'SI')
+    alertas.push({cls:'ok', msg:'<b>Exportador Habitual de Bienes:</b> No se retiene IVA (Res. NAC-DGERCGC20-00000061). El IR sí se retiene.'});
   if ((prov?.contribuyente_especial||'').toUpperCase() === 'SI')
     alertas.push({cls:'warn', msg:'<b>Contribuyente Especial:</b> FOODIX no retiene IVA — ellos son agentes de retención.'});
   if (d.concepto_cod === '311')

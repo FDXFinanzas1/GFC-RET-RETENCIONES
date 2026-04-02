@@ -60,27 +60,31 @@ CONCEPTOS_DICT = {
     for c in CONCEPTOS
 }
 
-def calcular_pct_iva(tipo_persona, contrib_especial, obligado, regimen, concepto_cod, tipo_compra, gran_contribuyente='NO'):
+def calcular_pct_iva(tipo_persona, contrib_especial, obligado, regimen, concepto_cod, tipo_compra, gran_contribuyente='NO', exportador_bienes='NO'):
     """Retorna el % de retención de IVA según proveedor y concepto.
 
     FOODIX es SOCIEDAD — puede retener IVA a cualquier proveedor excepto:
       - Grandes Contribuyentes → 0% IVA (y 0% IR)
+      - Exportadores Habituales de Bienes → 0% IVA (Res. NAC-DGERCGC20-00000061)
       - Contribuyentes Especiales → 0% IVA
       - Combustible, RIMPE Negocios Populares (332) → 0% IVA
     """
     # Prioridad 1: Gran Contribuyente — no retiene IVA ni IR
     if gran_contribuyente == 'SI':               return 0
 
-    # Prioridad 2: casos especiales por concepto (independiente del proveedor)
+    # Prioridad 2: Exportador Habitual de Bienes — no retiene IVA (IR sí)
+    if exportador_bienes == 'SI':                return 0
+
+    # Prioridad 3: casos especiales por concepto (independiente del proveedor)
     if concepto_cod == '311':                    return 100  # Liquidacion de compra: 100% siempre
     if concepto_cod in ('303', '304', '304E'):   return 100  # Honorarios PN: siempre 100%
     if concepto_cod == '320':                    return 100  # Arrendamiento: siempre 100%
     if concepto_cod in ('COMBUSTIBLE', '332'):   return 0    # Combustible / RIMPE NP: no retiene
 
-    # Prioridad 3: Contribuyente Especial — no retiene IVA
+    # Prioridad 4: Contribuyente Especial — no retiene IVA
     if contrib_especial == 'SI':                 return 0
 
-    # Prioridad 4: FOODIX retiene IVA a todos los demas (Sociedades, PN Obligada, PN No Obligada, RIMPE)
+    # Prioridad 5: FOODIX retiene IVA a todos los demas (Sociedades, PN Obligada, PN No Obligada, RIMPE)
     # Bienes: 30%, Servicios: 70%
     return 30 if tipo_compra == 'bien' else 70
 
@@ -95,7 +99,7 @@ def get_conn():
     try:
         return psycopg2.connect(**DB_CONFIG)
     except Exception:
-        cfg = DB_CONFIG.copy(); cfg['host'] = '4.246.223.171'
+        cfg = DB_CONFIG.copy(); cfg['host'] = 'chiosburguer.postgres.database.azure.com'
         return psycopg2.connect(**cfg)
 
 
@@ -125,6 +129,7 @@ def consultar_sri_api(ruc):
             'contribuyente_especial': d.get('contribuyenteEspecial', 'NO'),
             'actividad_economica': d.get('actividadEconomicaPrincipal', ''),
             'gran_contribuyente': 'NO',
+            'exportador_bienes': 'NO',
         }
     except Exception:
         return None
@@ -188,7 +193,8 @@ def buscar_proveedor(ruc):
         cur.execute('''
             SELECT ruc, razon_social, tipo_persona, regimen,
                    contribuyente_especial, obligado_contabilidad,
-                   agente_retencion, estado, actividad_economica, gran_contribuyente
+                   agente_retencion, estado, actividad_economica, gran_contribuyente,
+                   COALESCE(exportador_bienes, 'NO') as exportador_bienes
             FROM public."GFC-Prov-Proveedores" WHERE ruc = %s
         ''', (ruc,))
         row = cur.fetchone()
@@ -199,7 +205,8 @@ def buscar_proveedor(ruc):
             cur.execute('''
                 SELECT ruc, razon_social, tipo_persona, regimen,
                        contribuyente_especial, obligado_contabilidad,
-                       agente_retencion, estado, actividad_economica, gran_contribuyente
+                       agente_retencion, estado, actividad_economica, gran_contribuyente,
+                       COALESCE(exportador_bienes, 'NO') as exportador_bienes
                 FROM public."SRI_Catastro_RUC" WHERE ruc = %s
             ''', (ruc,))
             row = cur.fetchone()
@@ -224,6 +231,7 @@ def buscar_proveedor(ruc):
             'obligado_contabilidad': row[5], 'agente_retencion': row[6],
             'estado': row[7], 'actividad_economica': row[8],
             'gran_contribuyente': row[9] or 'NO',
+            'exportador_bienes': row[10] or 'NO',
             'fuente': fuente,
         })
     except Exception as e:
@@ -263,6 +271,7 @@ def calcular():
     obligado          = (d.get('obligado_contabilidad') or '').upper()
     regimen           = (d.get('regimen') or '').upper()
     gran_contribuyente= (d.get('gran_contribuyente') or 'NO').upper()
+    exportador_bienes = (d.get('exportador_bienes') or 'NO').upper()
 
     if subtotal <= 0:
         return jsonify({'error': 'El subtotal debe ser mayor a 0'}), 400
@@ -271,7 +280,7 @@ def calcular():
         return jsonify({'error': 'Seleccione un concepto de pago valido'}), 400
 
     pct_ir  = calcular_pct_ir(concepto['pct_ir'], gran_contribuyente)
-    pct_iva = calcular_pct_iva(tipo_persona, contrib_especial, obligado, regimen, concepto_cod, tipo_compra, gran_contribuyente)
+    pct_iva = calcular_pct_iva(tipo_persona, contrib_especial, obligado, regimen, concepto_cod, tipo_compra, gran_contribuyente, exportador_bienes)
 
     ret_ir        = round(subtotal * pct_ir / 100, 2)
     ret_iva       = round(iva_valor * pct_iva / 100, 2)
@@ -286,6 +295,7 @@ def calcular():
         'pct_iva': pct_iva, 'ret_iva': ret_iva,
         'total_pagar': total_pagar, 'tipo_compra': tipo_compra,
         'gran_contribuyente': gran_contribuyente,
+        'exportador_bienes': exportador_bienes,
     })
 
 if __name__ == '__main__':
